@@ -2,18 +2,15 @@ import os
 
 # Define your folder and file structure
 project_structure = {
-    "ALZHEIMAR_APP": [
-        "__pycache__/",
-        ".venv/",
-        "chrome_langchain_db/",
-        "model/",
-        "templates/",
-        "app.py",
-        "main.py",
-        "mybuild_.pdf",
-        "requirements.txt",
-        "vector.py"
-    ]
+    "__pycache__/",
+    ".venv/",
+    "chrome_langchain_db/",
+    "model/",
+    "templates/",
+    "app.py",
+    "main.py",
+    "requirements.txt",
+    "vector.py"
 }
 
 # Function to create folders and files

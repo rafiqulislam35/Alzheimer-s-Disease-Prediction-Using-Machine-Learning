@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Patients • Alzheimer’s App</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root {
+      --blue:#16a34a;
+      --bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --border: #e5e7eb;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+    }
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 56px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: #1f2933;
+      color: #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 0;
+      gap: 4px;
+    }
+    .sidebar-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #111827;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin: 4px 0 8px;
+    }
+    .side-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: #d1d5db;
+      border: 1px solid transparent;
+      text-decoration: none;
+    }
+    .side-icon.active,
+    .side-icon:hover {
+      background: #111827;
+      border-color: #374151;
+    }
+    .sidebar-footer {
+      margin-top: auto;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+
+    .main { display: flex; flex-direction: column; min-width: 0; }
+
+    /* TOPBAR (no search here now) */
+    .topbar {
+      background: var(--blue);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 18px;
+      gap: 12px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .topbar-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      white-space: nowrap;
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+    }
+    .user-pill {
+      background: rgba(15, 23, 42, 0.15);
+      border-radius: 999px;
+      padding: 4px 10px;
+      border: 1px solid rgba(15, 23, 42, 0.2);
+    }
+    .logout-link {
+      margin-left: 6px;
+      color: #ffffff;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .content {
+      padding: 14px 18px 22px;
+      min-width: 0;
+    }
+    .page-header { margin-bottom: 14px; }
+    .page-header h1 {
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    .page-subtitle {
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 12px 14px 14px;
+      box-shadow: 0 10px 25px rgba(15,23,42,0.04);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin-top: 8px;
+    }
+    thead {
+      background: #f9fafb;
+    }
+    th, td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    th {
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+    }
+    .badge-ok {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .badge-risk {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .pill-link {
+      font-size: 0.8rem;
+      color: var(--blue);
+      text-decoration: none;
+    }
+    .pill-link:hover {
+      text-decoration: underline;
+    }
+
+    .new-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--blue);
+      color: #ffffff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .new-btn:hover {
+      filter: brightness(1.05);
+    }
+
+    .link-button {
+      background: none;
+      border: none;
+      color: #b91c1c;
+      font-size: 0.8rem;
+      cursor: pointer;
+      padding: 0;
+      margin-left: 6px;
+      text-decoration: underline;
+    }
+    .link-button:hover {
+      opacity: 0.8;
+    }
+
+    .search-input {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 0.8rem;
+      min-width: 220px;
+    }
+
+    @media (max-width: 768px) {
+      .app-shell { grid-template-columns: 44px minmax(0,1fr); }
+      .content { padding: 10px 10px 18px; }
+      table { font-size: 0.82rem; }
+      th, td { padding: 6px 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      {% if role == "admin" %}
+        <div class="sidebar-logo">
+          <a href="/admin"
+            title="Back to admin dashboard"
+            style="color:#fff;text-decoration:none;display:flex;align-items:center;justify-content:center;width:100%;height:100%;">
+            A
+          </a>
+        </div>
+      {% endif %}
+
+      <a href="/dashboard" class="side-icon" title="User dashboard">🏠</a>
+      <a href="/patients" class="side-icon" title="Patients">👤</a>
+      <a href="/assistant" class="side-icon" title="Assistant">💬</a>
+      <a href="/admin" class="side-icon active" title="Settings">🛠️</a>
+      <div class="sidebar-footer">v1.0</div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+      <!-- TOPBAR: title + FULL NAME (not email) -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <span class="topbar-title">Alzheimer’s Disease Detection</span>
+        </div>
+        <div class="topbar-right">
+          <div class="user-pill">
+            {{ full_name or user_email or "User" }}
+            <a class="logout-link" href="/logout">Logout</a>
+          </div>
+        </div>
+      </header>
+
+      <main class="content">
+        <div class="page-header">
+          <h1>Patients</h1>
+          <p class="page-subtitle">
+            Latest patients based on your prediction history. Each patient shows the most recent model result.
+          </p>
+        </div>
+
+        <section class="card">
+          <!-- Card header row: title + search + New patient -->
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;">
+            <h2 style="margin:0;font-size:0.95rem;">Patient list</h2>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input
+                id="patient-search"
+                class="search-input"
+                type="text"
+                placeholder="Search by name, ID, or contact…"
+              />
+              <a href="/prediction" class="new-btn">+ New patient</a>
+            </div>
+          </div>
+
+          {% if patients and patients|length > 0 %}
+            <table id="patients-table">
+              <thead>
+                <tr>
+                  <th>PATIENT</th>
+                  <th>ID</th>
+                  <th>AGE</th>
+                  <th>GENDER</th>
+                  <th>CONTACT</th>
+                  <th>LAST PREDICTION</th>
+                  <th>LAST UPDATED</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for p in patients %}
+                  <tr>
+                    <td>{{ p.name }}</td>
+                    <td>{{ p.patient_id }}</td>
+                    <td>{{ p.age if p.age is not none else "-" }}</td>
+                    <td>{{ p.gender }}</td>
+                    <td>
+                      {% if p.phone %}
+                        <a href="tel:{{ p.phone }}" class="pill-link">{{ p.phone }}</a>
+                      {% else %}
+                        -
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if "No Alzheimer" in p.last_label %}
+                        <span class="badge badge-ok">{{ p.last_label }}</span>
+                      {% else %}
+                        <span class="badge badge-risk">{{ p.last_label }}</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if p.created_at %}
+                        {{ p.created_at.strftime("%Y-%m-%d %H:%M") }}
+                      {% else %}
+                        -
+                      {% endif %}
+                    </td>
+                    <td style="text-align:right; white-space:nowrap;">
+                      <a href="/patients/{{ p.patient_id }}/edit" class="pill-link">Edit</a>
+                      <form method="post"
+                            action="/patients/{{ p.patient_id }}/delete"
+                            style="display:inline;"
+                            onsubmit="return confirm('Delete this patient and all related predictions?');">
+                        <button type="submit" class="link-button">Delete</button>
+                      </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <p style="font-size:0.9rem;color:var(--text-muted);margin:4px 0 0;">
+              No patients yet. Create a prediction first from the
+              <a class="pill-link" href="/prediction">prediction form</a>.
+            </p>
+          {% endif %}
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- SIMPLE SEARCH: filters by name, ID, OR CONTACT -->
+  <script>
+    const searchInput = document.getElementById("patient-search");
+    if (searchInput) {
+      searchInput.addEventListener("input", function () {
+        const q = this.value.trim().toLowerCase();
+        const rows = document.querySelectorAll("#patients-table tbody tr");
+
+        rows.forEach((row) => {
+          const name = (row.children[0]?.innerText || "").toLowerCase();
+          const pid = (row.children[1]?.innerText || "").toLowerCase();
+          const contact = (row.children[4]?.innerText || "").toLowerCase();
+
+          if (!q || name.includes(q) || pid.includes(q) || contact.includes(q)) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      });
+    }
+  </script>
+</body>
+</html>

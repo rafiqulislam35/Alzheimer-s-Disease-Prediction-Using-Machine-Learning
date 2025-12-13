@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Alzheimer’s Prediction Form</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <style>
+    :root {
+      --green: #10b981;
+      --green-dark: #059669;
+      --green-light: #d1fae5;
+
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: "Poppins", system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 900px;
+      background: var(--card-bg);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 28px;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.7rem;
+      color: var(--text-main);
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+
+    .back-link {
+      color: var(--green-dark);
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    /* CARD */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .card-header h2 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    .card-header span {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    /* GRID FIXED */
+    .form-grid {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+      gap: 14px 18px;
+    }
+
+    .full-span {
+      grid-column: 1 / -1;
+    }
+
+    /* INPUTS */
+    label {
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      display: block;
+      color: var(--text-muted);
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      font-size: 0.92rem;
+      color: var(--text-main);
+      box-sizing: border-box;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 2px var(--green-light);
+      outline: none;
+    }
+
+    .muted-input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #f8fafc;
+      border: 1px dashed #94a3b8;
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+
+    /* BUTTONS */
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .add-patient-box {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      margin-top: -5px;
+      margin-bottom: 10px;
+      padding-right: 10px;
+    }
+
+    .add-patient-btn {
+      padding: 8px 16px;
+      background: #16a34a;
+      color: white;
+      border: none;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s ease-in-out;
+    }
+
+    .add-patient-btn:hover {
+      background: #15803d;
+      transform: translateY(-2px);
+    }
+
+    .predict-btn {
+      padding: 10px 20px;
+      border-radius: 999px;
+      border: none;
+      background: var(--green);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .predict-btn:hover { background: var(--green-dark); }
+
+    .clear-btn {
+      padding: 10px 20px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      border: 1px solid #cbd5e1;
+      color: var(--text-main);
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .clear-btn:hover { background: #cbd5e1; }
+
+    /* RESULT */
+    .result {
+      margin-top: 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--green-dark);
+      min-height: 22px;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* MOBILE */
+    @media(max-width:760px){
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .button-row {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Alzheimer’s Prediction Form</h1>
+        <p class="subtitle">Enter the patient’s details and clinical information.</p>
+      </div>
+      <a class="back-link" href="/dashboard">← Back to Dashboard</a>
+    </header>
+
+    <!-- PATIENT INFO -->
+    <section class="card">
+      <div class="card-header">
+        <h2>👤 Patient Information</h2>
+        <span>Required before prediction</span>
+      </div>
+
+      <form id="prediction-form">
+        <div class="form-grid">
+          <div>
+            <label for="patient_name">Full name</label>
+            <input id="patient_name" name="patient_name" type="text" required />
+          </div>
+
+          <div>
+            <label for="birthdate">Date of birth</label>
+            <input id="birthdate" name="birthdate" type="date" required />
+          </div>
+
+          <div>
+            <label for="gender">Gender</label>
+            <select id="gender" name="gender" required>
+              <option value="">Select...</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other / Prefer not to say</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="phone">Contact Number</label>
+            <input id="phone" name="phone" type="text" placeholder="+8801XXXXXXXXX" required />
+          </div>
+
+          <!-- FIX: full width -->
+          <div class="full-span">
+            <label>Patient ID</label>
+            <input class="muted-input" value="Will be generated automatically after prediction" disabled />
+          </div>
+
+          <!-- ADD PATIENT WITHOUT PREDICTION BUTTON -->
+          <div class="add-patient-row">
+            <button 
+                type="button"
+                class="add-patient-btn"
+                onclick="addPatientManual()">
+                + Add patient
+            </button>
+          </div>
+        </div>
+
+        <!-- MODEL INPUTS -->
+        <div class="card" style="margin-top:18px;">
+          <div class="card-header">
+            <h2>🧠 Input Features</h2>
+            <span>Model: Random Forest</span>
+          </div>
+
+          <div class="form-grid">
+            <div>
+              <label for="memory">Memory Complaints</label>
+              <input id="memory" name="memory_complaints" type="number" required />
+            </div>
+
+            <div>
+              <label for="behavior">Behavioral Problems</label>
+              <input id="behavior" name="behavioral_problems" type="number" required />
+            </div>
+
+            <div>
+              <label for="adl">ADL (Daily Living)</label>
+              <input id="adl" name="adl" type="number" required />
+            </div>
+
+            <div>
+              <label for="mmse">MMSE (0–30)</label>
+              <input id="mmse" name="mmse" type="number" min="0" max="30" required />
+            </div>
+
+            <!-- FIX: full width -->
+            <div class="full-span">
+              <label for="functional">Functional Assessment</label>
+              <input id="functional" name="functional_assessment" type="number" step="0.1" required />
+            </div>
+          </div>
+
+          
+          <div id="result" class="result"></div>
+        </div>
+        <div class="add-patient-row">
+            <button class="add-patient-btn" 
+            type="submit">Run prediction
+            </button>
+            <button type="button" class="clear-btn" onclick="clearFormFields()">Clear</button>
+          </div>
+      </form>
+    </section>
+  </div>
+
+<script>
+const form = document.getElementById("prediction-form");
+const resultEl = document.getElementById("result");
+
+// ----------------------------
+// RUN PREDICTION (existing)
+// ----------------------------
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const body = new URLSearchParams(new FormData(form));
+    resultEl.textContent = "⏳ Running prediction...";
+
+    try {
+        const resp = await fetch("/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body
+        });
+
+        const data = await resp.json();
+        resultEl.textContent = `🧩 Prediction: ${data.label} (ID: ${data.patient_id})`;
+    } catch (err) {
+        console.error(err);
+        resultEl.textContent = "❌ Error while running prediction.";
+    }
+});
+
+// ----------------------------
+// ADD PATIENT MANUALLY (NEW)
+// ----------------------------
+async function addPatientManual() {
+  const name = document.getElementById("patient_name").value.trim();
+  const birthdate = document.getElementById("birthdate").value;
+  const gender = document.getElementById("gender").value;
+  const phone = document.getElementById("phone").value.trim();
+
+  if (!name || !birthdate || !gender || !phone) {
+    alert("Please fill in name, birthdate, gender and contact number first.");
+    return;
+  }
+
+  const body = new URLSearchParams({
+    patient_name: name,
+    birthdate,
+    gender,
+    phone,
+  });
+
+  try {
+    const resp = await fetch("/patients/manual", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body,
+    });
+
+    const data = await resp.json();
+    if (data.ok) {
+      window.location.href = "/patients";
+    } else {
+      alert("Unable to add patient.");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Server error — patient not added.");
+  }
+}
+
+// ----------------------------
+// CLEAR FORM
+// ----------------------------
+function clearFormFields() {
+    form.reset();
+    resultEl.textContent = "";
+}
+</script>
+
+</body>
+</html>

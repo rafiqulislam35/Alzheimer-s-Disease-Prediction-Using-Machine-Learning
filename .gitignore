@@ -1,0 +1,17 @@
+# Python cache
+__pycache__/
+*.pyc
+# Virtual environment
+.venv/
+venv/
+# Environment variables
+.env
+# Vector / FAISS / Chroma indexes
+faiss_index/
+chrome_langchain_db/
+*.bin
+chroma.sqlite3
+
+# OS files
+.DS_Store
+Thumbs.db

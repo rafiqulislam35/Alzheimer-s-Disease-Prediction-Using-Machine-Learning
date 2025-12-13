@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Dashboard • Alzheimer’s App</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <style>
+    :root {
+      --blue: #16a34a;
+      --blue-soft: #e5f3ff;
+      --bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --border: #e5e7eb;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+    }
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+    }
+
+    /* APP SHELL */
+    .app-shell {
+      display: grid;
+      grid-template-columns: 56px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      background: #1f2933;
+      color: #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 0;
+      gap: 4px;
+    }
+    .sidebar-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #111827;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin: 4px 0 8px;
+    }
+    .side-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: #d1d5db;
+      border: 1px solid transparent;
+    }
+    .side-icon.active,
+    .side-icon:hover {
+      background: #111827;
+      border-color: #374151;
+    }
+    .sidebar-footer {
+      margin-top: auto;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+
+    /* MAIN AREA */
+    .main { display: flex; flex-direction: column; min-width: 0; }
+
+    /* TOP BAR */
+    .topbar {
+      background: var(--blue);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 18px;
+      gap: 12px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .topbar-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      white-space: nowrap;
+    }
+    .topbar-search { flex: 1; max-width: 380px; }
+    .topbar-search input {
+      width: 100%;
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: none;
+      font-size: 0.85rem;
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+    }
+    .user-pill {
+      background: rgba(15, 23, 42, 0.15);
+      border-radius: 999px;
+      padding: 4px 10px;
+      border: 1px solid rgba(15, 23, 42, 0.2);
+    }
+    .logout-link {
+      margin-left: 6px;
+      color: #ffffff;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* CONTENT */
+    .content {
+      padding: 14px 18px 22px;
+      min-width: 0;
+    }
+    .page-header { margin-bottom: 14px; }
+    .page-header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+    .page-subtitle {
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* TILE ROW */
+    .tiles-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .tile-card {
+      background: var(--card-bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 10px 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .tile-title { font-size: 0.9rem; font-weight: 600; }
+    .tile-body { font-size: 0.78rem; color: var(--text-muted); }
+    .tile-footer {
+      margin-top: 6px;
+      font-size: 0.78rem;
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .tile-badge {
+      margin-top: 6px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-weight: 500;
+      display: inline-block;
+    }
+    /* Make whole tile clickable */
+    .tile-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out,
+                  border-color 0.08s ease-out;
+    }
+
+    .tile-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+      border-color: var(--blue);
+    }
+
+    /* We won’t use tile-footer anymore */
+    .tile-footer {
+      display: none;
+    }
+
+
+    /* PANELS / CHARTS */
+    .panels-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 12px;
+      align-items: stretch;
+    }
+    .panel {
+      background: var(--card-bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 10px 12px 12px;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .panel-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .panel-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Chart containers */
+    .panel-body {
+      background: #f9fafb;
+      border-radius: 6px;
+      border: 1px solid #e5e7eb;
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Pie chart: fixed box, centered, keep circle */
+    .panel-body-pie {
+      height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .panel-body-pie canvas {
+      width: 100%;
+      max-width: 360px;
+      height: auto !important;  /* keep circle */
+    }
+
+    /* Line chart: full width, fixed height */
+    .panel-body-line {
+      height: 260px;
+    }
+    .panel-body-line canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .app-shell { grid-template-columns: 44px minmax(0, 1fr); }
+      .topbar { flex-wrap: wrap; align-items: flex-start; }
+      .topbar-search { max-width: none; }
+    }
+    @media (max-width: 640px) {
+      .panels-row { grid-template-columns: 1fr; }
+      .topbar-left { flex: 1 1 100%; }
+      .topbar-right { flex: 1 1 100%; justify-content: flex-end; }
+      .content { padding: 10px 10px 16px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-shell">
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+        {% if role == "admin" %}
+          <div class="sidebar-logo">
+            <a href="/admin"
+              title="Back to admin dashboard"
+              style="color:#fff;text-decoration:none;display:flex;align-items:center;justify-content:center;width:100%;height:100%;">
+              A
+            </a>
+          </div>
+        {% endif %}
+
+      <a href="/dashboard" class="side-icon" title="User dashboard">🏠</a>
+      <a href="/patients" class="side-icon" title="Patients">👤</a>
+      <a href="/assistant" class="side-icon" title="Assistant">💬</a>
+      <a href="/admin" class="side-icon active" title="Settings">🛠️</a>
+    <div class="sidebar-footer">v1.0</div>
+    </aside>
+
+
+    <!-- MAIN AREA -->
+    <div class="main">
+      <!-- TOP BLUE BAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <!-- App title -->
+    <span class="topbar-title">Alzheimer’s Disease Detection</span>
+  </div>
+
+  <div class="topbar-right">
+    <div class="user-pill">
+      <!-- show full name if available, otherwise email -->
+      {{ full_name or user_email or "User" }}
+      <a class="logout-link" href="/logout">Logout</a>
+    </div>
+  </div>
+</header>
+
+
+      <!-- PAGE CONTENT -->
+      <main class="content">
+        <div class="page-header">
+          <h1>Alzheimer patient monitoring dashboard</h1>
+          <p class="page-subtitle">
+            Hi {{ full_name or user_email or "there" }}. Quickly access prediction tools and see your recent activity.
+          </p>
+        </div>
+
+      <!-- TOP TILES -->
+      <section class="tiles-row">
+
+        <!-- Prediction form card (whole card clickable) -->
+        <a href="/prediction" class="tile-card tile-link">
+          <div class="tile-title">Prediction form</div>
+          <p class="tile-body">
+            Fill in clinical information and run the Alzheimer’s prediction model.
+          </p>
+          <span class="tile-badge">Predictions: {{ predictions_count or 0 }}</span>
+        </a>
+
+        <!-- Alzheimer assistant card (whole card clickable) -->
+        <a href="/assistant" class="tile-card tile-link">
+          <div class="tile-title">Alzheimer assistant</div>
+          <p class="tile-body">
+            Ask questions about Alzheimer’s disease. The assistant uses your PDF knowledge base.
+          </p>
+        </a>
+
+        <!-- KEEP Patient Status -->
+        <article class="tile-card">
+          <div class="tile-title">Patient status</div>
+          <p class="tile-body">
+            Future area to summarise risk levels or cognitive status per patient.
+          </p>
+          <span class="tile-badge">Coming soon</span>
+        </article>
+
+      </section>
+
+
+
+        <!-- MAIN PANELS / CHARTS -->
+        <section class="panels-row">
+          <!-- PIE CHART -->
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Prediction distribution</div>
+                <div class="panel-sub">Alzheimer's vs No Alzheimer's</div>
+              </div>
+            </div>
+            <div class="panel-body panel-body-pie">
+              <canvas id="sleepChart"></canvas>
+            </div>
+          </article>
+
+          <!-- LINE CHART -->
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Predictions over time</div>
+                <div class="panel-sub">Last 14 days</div>
+              </div>
+            </div>
+            <div class="panel-body panel-body-line">
+              <canvas id="trendChart"></canvas>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Chart.js + dashboard script -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    async function initDashboardCharts() {
+      const pieCanvas = document.getElementById("sleepChart");
+      const lineCanvas = document.getElementById("trendChart");
+      if (!pieCanvas || !lineCanvas) {
+        console.error("Chart canvas elements not found");
+        return;
+      }
+
+      const pieCtx = pieCanvas.getContext("2d");
+      const lineCtx = lineCanvas.getContext("2d");
+
+      let data;
+      try {
+        const resp = await fetch("/api/dashboard-charts");
+        if (!resp.ok) throw new Error("HTTP " + resp.status);
+        data = await resp.json();
+      } catch (err) {
+        console.error("Error fetching chart data, using dummy data:", err);
+        data = {
+          label_counts: [
+            { label: "Alzheimer's Detected", count: 3 },
+            { label: "No Alzheimer's", count: 5 },
+          ],
+          trend: {
+            dates: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"],
+            alzheimers: [1, 0, 1, 0, 1],
+            no_alzheimers: [0, 1, 0, 2, 2],
+          },
+        };
+      }
+
+      // PIE CHART (keep circular)
+      const labels = data.label_counts.map(d => d.label);
+      const counts = data.label_counts.map(d => d.count);
+      const hasPieData = counts.some(c => c > 0);
+
+        // Prepare buckets for fixed order & swapped colors
+        const buckets = {
+            "Alzheimer's Detected": 0,
+            "No Alzheimer's": 0,
+            "No prediction yet": 0,
+        };
+
+        // Fill buckets from backend data
+        data.label_counts.forEach(item => {
+            if (buckets[item.label] !== undefined) {
+                buckets[item.label] = item.count;
+            }
+        });
+
+        // Build pie chart with new fixed colors
+        new Chart(pieCtx, {
+          type: "pie",
+          data: {
+            labels: [
+              "Alzheimer's Detected",  // will appear as RED
+              "No Alzheimer's",        // will appear as BLUE
+              "No prediction yet"      // ORANGE
+            ],
+            datasets: [{
+              data: [
+                buckets["Alzheimer's Detected"],
+                buckets["No Alzheimer's"],
+                buckets["No prediction yet"]
+              ],
+              backgroundColor: [
+                "#ef4444",  // RED → Alzheimer's Detected
+                "#3b82f6",  // BLUE → No Alzheimer's
+                "#f59e0b"   // ORANGE → No prediction yet
+              ],
+              borderColor: "#ffffff",
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: { position: "bottom" }
+            }
+          }
+        });
+
+
+      // LINE CHART
+      const t = data.trend || { dates: [], alzheimers: [], no_alzheimers: [] };
+      const lineLabels = t.dates && t.dates.length ? t.dates : ["Day 1", "Day 2", "Day 3"];
+      const alzSeries = t.alzheimers && t.alzheimers.length ? t.alzheimers : [0,1,0];
+      const noAlzSeries = t.no_alzheimers && t.no_alzheimers.length ? t.no_alzheimers : [1,0,2];
+
+      new Chart(lineCtx, {
+        type: "line",
+        data: {
+          labels: lineLabels,
+          datasets: [
+    {
+        label: "Alzheimer's Detected",
+        data: alzSeries,
+        tension: 0.3,
+        borderColor: "#ef4444",      // RED
+        backgroundColor: "rgba(239, 68, 68, 0.3)",
+        pointBackgroundColor: "#ef4444",
+    },
+    {
+        label: "No Alzheimer's",
+        data: noAlzSeries,
+        tension: 0.3,
+        borderColor: "#3b82f6",      // BLUE
+        backgroundColor: "rgba(59, 130, 246, 0.3)",
+        pointBackgroundColor: "#3b82f6",
+    },
+],
+
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { precision: 0 },
+            },
+          },
+        },
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", initDashboardCharts);
+  </script>
+</body>
+</html>

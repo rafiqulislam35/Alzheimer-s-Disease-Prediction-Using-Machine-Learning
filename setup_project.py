@@ -1,6 +1,5 @@
 import os
 
-# Define your folder and file structure
 project_structure = {
     "__pycache__/",
     ".venv/",

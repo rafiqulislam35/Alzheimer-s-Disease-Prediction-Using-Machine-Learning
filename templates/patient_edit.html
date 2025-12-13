@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Edit Patient • Alzheimer’s App</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+:root {
+  --blue: #0078d4;
+  --bg: #f3f4f6;
+  --card-bg: #ffffff;
+  --border: #e5e7eb;
+  --text-main: #111827;
+  --text-muted: #6b7280;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text-main);
+}
+
+.wrap {
+  max-width: 920px;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+
+/* =========================
+   TOP BAR
+========================= */
+
+.topbar {
+  background: var(--blue);
+  color: #ffffff;
+  padding: 10px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-pill {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.user-pill a {
+  color: #ffffff;
+  margin-left: 8px;
+  text-decoration: underline;
+}
+
+/* =========================
+   PAGE HEADER
+========================= */
+
+.page-header {
+  margin: 20px 0 14px;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.page-header .sub {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* =========================
+   LAYOUT GRID
+========================= */
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 860px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.card h2 {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+}
+
+/* =========================
+   FORM ELEMENTS
+========================= */
+
+label {
+  display: block;
+  margin: 10px 0 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  background: #ffffff;
+  color: var(--text-main);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+}
+
+textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.btn-primary {
+  background: var(--blue);
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  filter: brightness(0.95);
+}
+
+/* =========================
+   HISTORY TABLE
+========================= */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+
+th,
+td {
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+th {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #fafafa;
+}
+
+/* =========================
+   BADGES
+========================= */
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  border: 1px solid var(--border);
+  background: #f9fafb;
+}
+
+.badge-ok {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.badge-risk {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div><b>Alzheimer’s App</b> • Edit patient</div>
+    <div class="pill">
+      {{ full_name or user_email or "User" }}
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="header">
+      <div>
+        <h1 style="margin:0;font-size:1.2rem;">Edit patient: {{ patient.name }}</h1>
+        <div style="color:var(--muted);margin-top:4px;font-size:.9rem;">
+          Patient ID: <span style="font-family:ui-monospace,monospace;">{{ patient.patient_id }}</span>
+        </div>
+      </div>
+      <a class="btn" href="/patients">← Back to patients</a>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: Patient info -->
+      <div class="card">
+        <h2>👤 Patient information</h2>
+        <form method="post" action="/patients/{{ patient.patient_id }}/edit">
+          <label>Full name</label>
+          <input name="name" value="{{ patient.name }}" required />
+
+          <label>Age</label>
+          <input name="age" type="number" value="{{ patient.age or '' }}" min="0" max="120" />
+
+          <label>Gender</label>
+          <select name="gender">
+            <option value="Male"   {{ 'selected' if patient.gender=='Male' else '' }}>Male</option>
+            <option value="Female" {{ 'selected' if patient.gender=='Female' else '' }}>Female</option>
+            <option value="Other"  {{ 'selected' if patient.gender=='Other' else '' }}>Other</option>
+          </select>
+
+          <label>Phone</label>
+          <input name="phone" value="{{ patient.phone or '' }}" />
+
+          <label>Address</label>
+          <input name="address" value="{{ patient.address or '' }}" />
+
+          <label>Emergency contact name</label>
+          <input name="emergency_name" value="{{ patient.emergency_name or '' }}" />
+
+          <label>Emergency contact phone</label>
+          <input name="emergency_phone" value="{{ patient.emergency_phone or '' }}" />
+
+          <label>Primary doctor (optional)</label>
+          <input name="doctor_name" value="{{ patient.doctor_name or '' }}" />
+
+          <label>Notes</label>
+          <textarea name="notes">{{ patient.notes or '' }}</textarea>
+
+          <div class="actions">
+            <button class="btn btn-primary" type="submit">Save changes</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- RIGHT: History -->
+      <div class="card">
+        <h2>🧾 Patient history</h2>
+
+        {% if history and history|length > 0 %}
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Result</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for h in history %}
+                <tr>
+                  <td style="font-family:ui-monospace,monospace;">
+                    {{ h.created_at.strftime("%Y-%m-%d %H:%M") if h.created_at else "-" }}
+                  </td>
+                  <td><span class="badge">{{ h.kind }}</span></td>
+                  <td>
+                    {% if h.label and "No Alzheimer" in h.label %}
+                      <span class="badge badge-ok">{{ h.label }}</span>
+                    {% else %}
+                      <span class="badge badge-risk">{{ h.label or "-" }}</span>
+                    {% endif %}
+                  </td>
+                  <td style="color:var(--muted);">
+                    {% if h.details %}{{ h.details }}{% else %}-{% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div style="color:var(--muted);font-size:.9rem;">No history yet.</div>
+        {% endif %}
+
+        <hr style="border:none;border-top:1px solid var(--border);margin:14px 0;">
+
+        <h2 style="margin-top:0;">➕ Add history note</h2>
+        <form method="post" action="/patients/{{ patient.patient_id }}/history">
+          <label>Note</label>
+          <textarea name="details" placeholder="Example: Follow-up visit, caregiver reported sleep problems…"></textarea>
+          <div class="actions">
+            <button class="btn btn-primary" type="submit">Add note</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

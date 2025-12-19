@@ -27,6 +27,7 @@ from bson import ObjectId
 
 from authlib.integrations.starlette_client import OAuth
 from starlette.middleware.sessions import SessionMiddleware
+from bson.errors import InvalidId
 
 # -----------------------------
 # Config & secrets
@@ -723,41 +724,45 @@ async def login_get(request: Request):
 
 
 @app.post("/login", response_class=HTMLResponse)
-async def login_post(
-    request: Request,
-    email: str = Form(...),
-    password: str = Form(...),
-):
+async def login_post(request: Request, email: str = Form(...), password: str = Form(...)):
     email_clean = email.strip().lower()
 
+    # Find the user by email and check the password
     user = users_col.find_one({"email": email_clean})
     if not user or not verify_password(password, user["password"]):
         return templates.TemplateResponse(
             "login.html",
-            {"request": request, "message": "Invalid email or password."},
+            {"request": request, "message": "Invalid email or password."}
         )
 
-    # ✅ FIX: this must be inside the function and properly indented
+    # If the account is disabled, return the error message
     if user.get("status") == "disabled":
         return templates.TemplateResponse(
             "login.html",
-            {"request": request, "message": "Account disabled."},
+            {"request": request, "message": "Account disabled."}
         )
 
-    # ✅ Force admin if email is in ADMIN_EMAILS (even if DB role is wrong)
+    # Force admin if email is in ADMIN_EMAILS (even if DB role is wrong)
     role = "admin" if is_admin_email(email_clean) else user.get("role", "user")
 
-    # ✅ keep DB consistent (optional but recommended)
-    users_col.update_one({"_id": user["_id"]}, {"$set": {"role": role}})
+    # Optionally, keep the DB consistent by updating the user's role
+    users_col.update_one(
+        {"_id": user["_id"]},
+        {"$set": {"role": role}}
+    )
 
+    # Create token for the session
     token = create_token(str(user["_id"]), role=role)
 
+    # Redirect to admin or dashboard based on the role
     redirect_to = "/admin" if role == "admin" else "/dashboard"
     resp = RedirectResponse(url=redirect_to, status_code=302)
 
-    # ✅ IMPORTANT: use the same cookie name your get_current_user reads
-    resp.set_cookie("auth_token", token, httponly=True, max_age=60 * 60 * 12)
+    # Set the authentication token in the response cookie
+    resp.set_cookie("auth_token", token, httponly=True, max_age=60 * 60 * 12)  # 12 hours expiry
+
     return resp
+
 
 
 
